@@ -108,36 +108,37 @@ async function test2() {
     ".json";
   const fileType = "application/json";
   const fileSize = fileBuffer.byteLength;
+  console.log("fileSize",fileSize)
 
-  const rs = new ReedSolomon();
-  const expectCheckSums = await rs.encode(Uint8Array.from(fileBuffer));
+  // const rs = new ReedSolomon();
+  // const expectCheckSums = await rs.encode(Uint8Array.from(fileBuffer));
 
-  const createObjectTx = await client.object.createObject({
-    bucketName: "testbucket0501",
-    objectName: fileName,
-    creator: process.env.ACCOUNT_ADDRESS,
-    visibility: VisibilityType.VISIBILITY_TYPE_PUBLIC_READ,
-    contentType: fileType,
-    redundancyType: RedundancyType.REDUNDANCY_EC_TYPE,
-    payloadSize: Long.fromInt(fileBuffer.length),
-    expectChecksums: expectCheckSums.map((x) => bytesFromBase64(x)),
-  });
+  // const createObjectTx = await client.object.createObject({
+  //   bucketName: "testbucket0501",
+  //   objectName: fileName,
+  //   creator: process.env.ACCOUNT_ADDRESS,
+  //   visibility: VisibilityType.VISIBILITY_TYPE_PUBLIC_READ,
+  //   contentType: fileType,
+  //   redundancyType: RedundancyType.REDUNDANCY_EC_TYPE,
+  //   payloadSize: Long.fromInt(fileBuffer.length),
+  //   expectChecksums: expectCheckSums.map((x) => bytesFromBase64(x)),
+  // });
 
-  const simulateInfo = await createObjectTx.simulate({
-    denom: "BNB",
-  });
+  // const simulateInfo = await createObjectTx.simulate({
+  //   denom: "BNB",
+  // });
 
-  const createObjectTxRes = await createObjectTx.broadcast({
-    denom: "BNB",
-    gasLimit: Number(simulateInfo?.gasLimit),
-    gasPrice: simulateInfo?.gasPrice || "5000000000",
-    payer: process.env.ACCOUNT_ADDRESS,
-    granter: "",
-    privateKey: process.env.ACCOUNT_PRIVATEKEY,
-  });
+  // const createObjectTxRes = await createObjectTx.broadcast({
+  //   denom: "BNB",
+  //   gasLimit: Number(simulateInfo?.gasLimit),
+  //   gasPrice: simulateInfo?.gasPrice || "5000000000",
+  //   payer: process.env.ACCOUNT_ADDRESS,
+  //   granter: "",
+  //   privateKey: process.env.ACCOUNT_PRIVATEKEY,
+  // });
 
 
-  var result = await client.object.uploadObject(
+  var result = await client.object.delegateUploadObject(
     {
       bucketName: "testbucket0501",
       objectName: fileName,
@@ -147,7 +148,9 @@ async function test2() {
         size: fileSize,
         content: fileBuffer,
       },
-      txnHash: createObjectTxRes.transactionHash,
+      delegatedOpts: {
+        visibility: VisibilityType.VISIBILITY_TYPE_PUBLIC_READ,
+      },
     },
     {
       type: "ECDSA",
