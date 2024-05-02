@@ -88,6 +88,12 @@ function createFile(path) {
   };
 }
 
+
+// result {
+//   code: '110004',
+//   message: 'invalid payload data integrity hash',
+//   statusCode: 406
+// }
 async function test2() {
   const jsonStr =
     '{ "name": "John Doe", "age": 30, "email": "johndoe@example.com" }';
